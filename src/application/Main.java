@@ -1,8 +1,4 @@
 package application;
-	
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.PointerInfo;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -16,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 
 public class Main extends Application {
 	static Scene scene;
+	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -24,27 +21,26 @@ public class Main extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			
 			primaryStage.setScene(scene);
+			primaryStage.setTitle("Algorithm Simulator (Group 7 - Topic 1)");
 			primaryStage.setResizable(false);
 			primaryStage.show();
+			
+			AnchorPane canvas = (AnchorPane) scene.lookup("#canvas");
+			
+			canvas.setOnMouseClicked(new EventHandler<MouseEvent>() {
+				public void handle(MouseEvent event) {
+					Text mouseCoord = (Text) scene.lookup("#mouseCoordinate");
+					mouseCoord.setText(event.getX() + " - " + event.getY());
+				}
+			});
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void getxy() {
-	}
 	
 	public static void main(String[] args) {
 		launch(args);
-		PointerInfo info = MouseInfo.getPointerInfo();
-		Point p = info.getLocation();
-		Text mouseCoord = (Text) scene.lookup("mouseCoordinate");
-		AnchorPane canvas = (AnchorPane) scene.lookup("canvas");
-		canvas.addEventHandler(MouseEvent.MOUSE_EXITED, new EventHandler<MouseEvent>(){
-			public void handle(MouseEvent e) {
-				mouseCoord.setText(p.x + ", " + p.y);
-			}
-		});
 	}
 	
 	
