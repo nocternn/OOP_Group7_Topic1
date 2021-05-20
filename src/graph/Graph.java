@@ -22,6 +22,8 @@ public class Graph {
 
 	/**
 	 * Generate a random graph with 'number' nodes.
+	 * The name of each node is its id in generation order.
+	 * Each node's category is randomly selected.
 	 * @param number
 	 * @param maxX
 	 * @param maxY
@@ -30,25 +32,10 @@ public class Graph {
 	public boolean generate(int number, int maxX, int maxY) {
 		Random rand = new Random();
 		for (int i = 0; i < number; i++) {
-			int x = rand.nextInt(maxX);
-			int y = rand.nextInt(maxY);
-			add(new Node(x, y, Integer.toString(i)));
+			double x = rand.nextDouble() * maxX;
+			double y = rand.nextDouble() * maxY;
+			add(new Node(x, y, Integer.toString(i), NodeCategories.getRandom()));
 		}
 		return true;
-	}
-
-	class Node {
-		int x, y;
-		String name = "";
-
-		public Node(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
-		public Node(int x, int y, String name) {
-			this.x = x;
-			this.y = y;
-			this.name = name;
-		}
 	}
 }
