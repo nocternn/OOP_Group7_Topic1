@@ -5,15 +5,12 @@ import javafx.scene.paint.Color;
 
 abstract class NodeCategories {
 	private static Color[] categories = {
-			Color.BLUE,
 			Color.CYAN,
-			Color.GRAY,
-			Color.GREEN,
 			Color.MAGENTA,
 			Color.ORANGE,
 			Color.PINK,
 			Color.RED,
-			Color.YELLOW,
+			Color.GREEN
 	};
 	
 	/**

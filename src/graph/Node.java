@@ -3,9 +3,9 @@ package graph;
 import javafx.scene.paint.Color;
 
 public class Node {
-	double x, y;
-	String name = "";
-	Color category = Color.BLACK;
+	private double x, y;
+	private String name = "";
+	private Color category = Color.BLACK;
 
 	public Node(double x, double y) {
 		this.x = x;
@@ -35,6 +35,12 @@ public class Node {
 		this.category = category;
 	}
 	
+	public double getX() {
+		return this.x;
+	}
+	public double getY() {
+		return this.y;
+	}
 	public Color getCategory() {
 		return this.category;
 	}

@@ -10,6 +10,23 @@ public class Graph {
 	public Graph() {
 		this.nodes  = new ArrayList<>();
 	}
+	
+	/**
+	 * Get a list of all nodes in the graph.
+	 * @return nodes
+	 */
+	public ArrayList<Node> getNodes() {
+		return this.nodes;
+	}
+	
+	/**
+	 * Get a random node.
+	 * @return random node
+	 */
+	public Node getRandomNode() {
+		Random rand = new Random();
+		return this.nodes.get(rand.nextInt(nodes.size()));
+	}
 
 	/**
 	 * Add a new node to the current graph.
