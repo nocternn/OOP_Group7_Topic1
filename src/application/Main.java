@@ -52,8 +52,8 @@ public class Main extends Application {
 			
 			// random graph
 			graph = new Graph();
-			graph.generate(100, 1000, 650);
-			brush.drawGraph(graph.getNodes());
+//			graph.generate(2000, 1000, 650);
+//			brush.drawGraph(graph.getNodes());
 			
 			// Implementation of MeanShift button function
 			Button btnKNN = (Button) scene.lookup("#btnKNN");

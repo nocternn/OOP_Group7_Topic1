@@ -3,12 +3,15 @@ package graph;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javafx.scene.paint.Color;
+
 public class Graph {
-	private ArrayList<Node> nodes;
+	private ArrayList<Node> categorizedNodes;
+	private ArrayList<Node> uncategorizedNodes;
 
 	// Constructor
 	public Graph() {
-		this.nodes  = new ArrayList<>();
+		this.categorizedNodes  = new ArrayList<>();
 	}
 	
 	/**
@@ -16,7 +19,10 @@ public class Graph {
 	 * @return nodes
 	 */
 	public ArrayList<Node> getNodes() {
-		return this.nodes;
+		ArrayList<Node> nodes = new ArrayList<>();
+		nodes.addAll(this.categorizedNodes);
+		nodes.addAll(this.uncategorizedNodes);
+		return nodes;
 	}
 	
 	/**
@@ -25,7 +31,7 @@ public class Graph {
 	 */
 	public Node getRandomNode() {
 		Random rand = new Random();
-		return this.nodes.get(rand.nextInt(nodes.size()));
+		return this.categorizedNodes.get(rand.nextInt(categorizedNodes.size()));
 	}
 
 	/**
@@ -34,7 +40,9 @@ public class Graph {
 	 * @return true - if a new node is added.
 	 */
 	public boolean add(Node node) {
-		return this.nodes.add(node);
+		if (node.getCategory() == Color.BLACK)
+			return this.uncategorizedNodes.add(node);
+		return this.categorizedNodes.add(node);
 	}
 
 	/**
