@@ -1,6 +1,7 @@
 package algorithms;
 
 import graph.Graph;
+import graph.Node;
 import graphics.Animation;
 import graphics.Brush;
 
@@ -18,7 +19,8 @@ public class MeanShift implements Animation {
 
 	@Override
 	public void start() {
-//		brush.drawCircle(exampleNode.getX(), exampleNode.getY(), bandwidth * 10);
+		Node node = graph.getUncategorizedNode();
+		brush.drawCircle(node.getX(), node.getY(), bandwidth * 10);
 		System.out.println("[INFO] Start Mean Shift Clustering animation");
 	}
 

@@ -8,8 +8,11 @@ import javafx.scene.paint.Color;
 
 public class Brush {
 	private GraphicsContext graphicsContext;
+	private double canvasWidth, canvasHeight;
 	
-	public Brush(GraphicsContext graphicsContext) {
+	public Brush(GraphicsContext graphicsContext, double canvasWidth, double canvasHeight) {
+		this.canvasWidth = canvasWidth;
+		this.canvasHeight = canvasHeight;
 		this.graphicsContext = graphicsContext;
 		graphicsContext.setLineWidth(1);
 	}
@@ -32,11 +35,31 @@ public class Brush {
 	 */
 	public void drawPoint(double x, double y, Color color) {
 		graphicsContext.setFill(color);
-		graphicsContext.fillRoundRect(x, y, 5, 5, 1, 1);
+		graphicsContext.fillRect(x, y, 5, 5);
 	}
 	
+	/**
+	 * Draw a circle with the specified center coordinates.
+	 * @param x
+	 * @param y
+	 * @param radius
+	 */
 	public void drawCircle(double x, double y, int radius) {
 		graphicsContext.setStroke(Color.BLUE);
 		graphicsContext.strokeOval(x - radius, y - radius, radius * 2, radius * 2);
+	}
+	
+	/**
+	 * Clear the canvas
+	 */
+	public void clear() {
+		graphicsContext.clearRect(0, 0, canvasWidth, canvasHeight);
+	}
+	
+	/**
+	 * Clear a point
+	 */
+	public void clearPoint(double x, double y) {
+		graphicsContext.clearRect(x, y, 5, 5);
 	}
 }
