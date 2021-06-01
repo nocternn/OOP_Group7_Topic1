@@ -7,7 +7,6 @@ import graphics.Brush;
 
 public class MeanShift implements Animation {
 	private Graph graph;
-	private Node exampleNode;
 	private Brush brush;
 	private int bandwidth;
 
@@ -15,13 +14,13 @@ public class MeanShift implements Animation {
 	public MeanShift(int bandwidth, Graph graph, Brush brush) {
 		this.bandwidth = bandwidth;
 		this.graph = graph;
-		this.exampleNode = graph.getRandomNode();
 		this.brush = brush;
 	}
 
 	@Override
 	public void start() {
-		brush.drawCircle(exampleNode.getX(), exampleNode.getY(), bandwidth * 10);
+		Node node = graph.getUncategorizedNode();
+		brush.drawCircle(node.getX(), node.getY(), bandwidth * 10);
 		System.out.println("[INFO] Start Mean Shift Clustering animation");
 	}
 

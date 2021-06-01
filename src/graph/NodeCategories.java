@@ -1,24 +1,26 @@
 package graph;
 
-import java.util.Random;
 import javafx.scene.paint.Color;
 
 abstract class NodeCategories {
 	private static Color[] categories = {
-			Color.CYAN,
 			Color.MAGENTA,
 			Color.ORANGE,
-			Color.PINK,
 			Color.RED,
-			Color.GREEN
+			Color.GREEN,
+			Color.CYAN,
+			Color.PINK
 	};
 	
 	/**
-	 * Get a random category color.
+	 * Get a category color.
 	 * @return
 	 */
-	public static Color getRandom() {
-		Random rand = new Random();
-		return categories[rand.nextInt(categories.length)];
+	public static Color getColor(int index) {
+		return categories[index];
+	}
+	
+	public static int getSize() {
+		return categories.length;
 	}
 }
