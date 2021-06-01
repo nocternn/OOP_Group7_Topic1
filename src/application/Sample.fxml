@@ -22,7 +22,10 @@
                               <Cursor fx:constant="CROSSHAIR" />
                            </cursor>
                            <children>
-                              <Canvas id="canvas" height="650.0" width="1000.0" />
+                              <Canvas id="canvasGraph" height="650.0" width="1000.0" />
+                              <Canvas id="canvasKNN" height="650.0" width="1000.0" />
+                              <Canvas id="canvasKMeans" height="650.0" width="1000.0" />
+                              <Canvas id="canvasMeanShift" height="650.0" width="1000.0" />
                               <Text id="description" layoutX="14.0" layoutY="671.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" />
                            </children></AnchorPane>
                       <AnchorPane id="menu" maxWidth="1.7976931348623157E308" prefHeight="689.0" prefWidth="289.0">
