@@ -11,12 +11,14 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 public class MeanShift implements Animation {
+	private Node uncategorizedNode;
 	private Brush brush;
 	private Timeline timeline;
 	
 	public MeanShift() { /* Empty constructor */ }
 	public MeanShift(int bandwidth, Graph graph, Brush brush) {
 		this.brush = brush;
+		this.uncategorizedNode = graph.getUncategorizedNode();
 		this.timeline = new Timeline();
 		meanShiftClustering(graph, bandwidth);
 	}
@@ -42,6 +44,8 @@ public class MeanShift implements Animation {
 	@Override
 	public void stop() {
 		this.timeline.stop();
+		this.brush.clear();
+		this.brush.drawPoint(uncategorizedNode.getX(), uncategorizedNode.getY(), uncategorizedNode.getCategory());
 		System.out.println("[INFO] Stop Mean Shift Clustering animation");
 	}
 
@@ -49,13 +53,18 @@ public class MeanShift implements Animation {
 	public void previous() {
 		this.timeline.pause();
 		double previousTime = Math.floor(this.timeline.getCurrentTime().toSeconds()) - 1;
-		this.timeline.playFrom(Duration.seconds(previousTime));
-		PauseTransition pause = new PauseTransition(Duration.seconds(1));
-        pause.setOnFinished((pauseEvent) -> {
-        	this.timeline.pause();
-        });
-        pause.play();
-		System.out.println("[INFO] Previous step in Mean Shift Clustering animation");
+		if (previousTime < 0) {
+			this.brush.clear();
+			this.brush.drawPoint(uncategorizedNode.getX(), uncategorizedNode.getY(), uncategorizedNode.getCategory());
+		} else {
+			this.timeline.playFrom(Duration.seconds(previousTime));
+			PauseTransition pause = new PauseTransition(Duration.seconds(1));
+	        pause.setOnFinished((pauseEvent) -> {
+	        	this.timeline.pause();
+	        });
+	        pause.play();
+			System.out.println("[INFO] Previous step in Mean Shift Clustering animation");
+		}
 	}
 
 	@Override
@@ -118,7 +127,7 @@ public class MeanShift implements Animation {
 			newNode = node;
 			timeBetweenFrames += 1;
 		} while (distance(currentNode, newNode) > 0.00005); // Run while the shifting distance is still significant
-		graph.setUncategorizedNode(null); // Reset uncategorized node for future runs
+		graph.setUncategorizedNode(uncategorizedNode); // Reset uncategorized node for future runs
 	}
 	
 	/**
