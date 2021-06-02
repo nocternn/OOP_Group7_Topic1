@@ -11,67 +11,19 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 public class MeanShift implements Animation {
-	private static double EPSILON = 0.00005;
-	private Graph graph;
 	private Brush brush;
-	private int bandwidth;
 	private Timeline timeline;
-	private double timeBetweenFrames = 1;
 	
 	public MeanShift() { /* Empty constructor */ }
 	public MeanShift(int bandwidth, Graph graph, Brush brush) {
-		this.bandwidth = bandwidth;
-		this.graph = graph;
 		this.brush = brush;
 		this.timeline = new Timeline();
+		meanShiftClustering(graph, bandwidth);
 	}
 
 	@Override
 	public void start() {
-		drawStep(graph.getUncategorizedNode());
-		// Shift the uncategorized node towards a center
-		Node currentNode = null, newNode = null;
-		do {
-			currentNode = graph.getUncategorizedNode();
-			double shiftX = 0, shiftY = 0, scaleFactor = 0;
-			for (Node originalNode : graph.getCategorizedNodes()) {
-				// Calculate the distance
-				double distance = distance(currentNode, originalNode);
-				if (distance <= this.bandwidth) {
-					double weight = kernel(distance, this.bandwidth);
-					if (weight > 0) {
-						// Calculate the numerator
-						shiftX += originalNode.getX() * weight;
-						shiftY += originalNode.getY() * weight;
-						// Calculate the denominator
-						scaleFactor += weight;
-					}
-				}
-			}
-			shiftX = shiftX / scaleFactor;
-			shiftY = shiftY / scaleFactor;
-			// Set the new shifted point
-			final Node node = new Node(shiftX, shiftY, Color.BLACK);
-			graph.setUncategorizedNode(node);
-			// Set animation
-			this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames), (event) -> {
-				drawStep(node);
-				timeline.pause();
-				PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
-	            pause.setOnFinished((pauseEvent) -> {
-	            	brush.clear();
-		            drawStep(node);
-	            	timeline.play();
-	            });
-	            pause.play();
-			}));
-			// Set new node variable
-			newNode = node;
-			timeBetweenFrames += 1;
-		} while (distance(currentNode, newNode) > EPSILON);
-		// Start animation
 		this.timeline.play();
-		// Log
 		System.out.println("[INFO] Start Mean Shift Clustering animation");
 	}
 
@@ -95,12 +47,78 @@ public class MeanShift implements Animation {
 
 	@Override
 	public void previous() {
+		this.timeline.pause();
+		double previousTime = Math.floor(this.timeline.getCurrentTime().toSeconds()) - 1;
+		this.timeline.playFrom(Duration.seconds(previousTime));
+		PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        pause.setOnFinished((pauseEvent) -> {
+        	this.timeline.pause();
+        });
+        pause.play();
 		System.out.println("[INFO] Previous step in Mean Shift Clustering animation");
 	}
 
 	@Override
 	public void next() {
+		this.timeline.pause();
+		double nextTime = Math.ceil(this.timeline.getCurrentTime().toSeconds());
+		this.timeline.playFrom(Duration.seconds(nextTime));
+		PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        pause.setOnFinished((pauseEvent) -> {
+        	this.timeline.pause();
+        });
+        pause.play();
 		System.out.println("[INFO] Next step in Mean Shift Clustering animation");
+	}
+
+	/**
+	 * Implementation of the Mean Shift Clustering algorithm. It is run once at the initialization of an object instance
+	 * in order to build the animation required.
+	 * @param graph
+	 * @param bandwidth
+	 */
+	private void meanShiftClustering(Graph graph, int bandwidth) {
+		double timeBetweenFrames = 0;
+		Node currentNode = null, newNode = null;
+		do {
+			currentNode = graph.getUncategorizedNode();
+			double shiftX = 0, shiftY = 0, scaleFactor = 0;
+			for (Node originalNode : graph.getCategorizedNodes()) {
+				// Calculate the distance
+				double distance = distance(currentNode, originalNode);
+				if (distance <= bandwidth) {
+					double weight = kernel(distance, bandwidth);
+					if (weight > 0) {
+						// Calculate the numerator
+						shiftX += originalNode.getX() * weight;
+						shiftY += originalNode.getY() * weight;
+						// Calculate the denominator
+						scaleFactor += weight;
+					}
+				}
+			}
+			shiftX = shiftX / scaleFactor;
+			shiftY = shiftY / scaleFactor;
+			// Set the new shifted point
+			final Node node = new Node(shiftX, shiftY, Color.BLACK);
+			graph.setUncategorizedNode(node);
+			// Set animation
+			this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames), (event) -> {
+				drawStep(node, bandwidth);
+				timeline.pause();
+				PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
+	            pause.setOnFinished((pauseEvent) -> {
+	            	brush.clear();
+		            drawStep(node, bandwidth);
+	            	timeline.play();
+	            });
+	            pause.play();
+			}));
+			// Set new variables
+			newNode = node;
+			timeBetweenFrames += 1;
+		} while (distance(currentNode, newNode) > 0.00005); // Run while the shifting distance is still significant
+		graph.setUncategorizedNode(null); // Reset uncategorized node for future runs
 	}
 	
 	/**
@@ -127,9 +145,13 @@ public class MeanShift implements Animation {
 		return Math.pow(Math.E, -0.5 * (squareDistance / squareBandwidth));
 	}
 	
-	private void drawStep(Node node) {
-		// Draw current step on top of previous step
+	/**
+	 * Draw current point with window of radius specified.
+	 * @param node
+	 * @param radius
+	 */
+	private void drawStep(Node node, int radius) {
 		brush.drawPoint(node.getX(), node.getY(), Color.BLACK);
-		brush.drawCircle(node.getX(), node.getY(), this.bandwidth);
+		brush.drawCircle(node.getX(), node.getY(), radius);
 	}
 }

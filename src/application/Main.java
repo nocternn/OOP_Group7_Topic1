@@ -184,17 +184,19 @@ public class Main extends Application {
 							canvasKMeans.setVisible(false);
 							// Enable current algorithm canvas
 							canvasMeanShift.setVisible(true);
-							// Create new brush for current algorithm canvas
-							Brush brushMeanShift = new Brush(canvasMeanShift.getGraphicsContext2D(), canvasMeanShift.getWidth(), canvasMeanShift.getHeight());
 							try {
 								Node uncategorizedNode = graph.getUncategorizedNode();
-								brushGraph.clearPoint(uncategorizedNode.getX(), uncategorizedNode.getY());				// Clear graph canvas' uncategorized node
-								brushGraph.drawPoint(uncategorizedNode.getX(), uncategorizedNode.getY(), Color.BLACK);	// Draw uncategorized node on Mean Shift canvas
+								brushGraph.clearPoint(uncategorizedNode.getX(), uncategorizedNode.getY());							// Clear graph canvas' uncategorized node
+								Brush brushMeanShift = new Brush(																	// Create new brush for current algorithm canvas
+										canvasMeanShift.getGraphicsContext2D(),
+										canvasMeanShift.getWidth(), canvasMeanShift.getHeight()
+								);
+								brushMeanShift.clear();
+								brushMeanShift.drawPoint(uncategorizedNode.getX(), uncategorizedNode.getY(), Color.BLACK);			// Draw uncategorized node on Mean Shift canvas
+								currentAnimation = new MeanShift(Integer.parseInt(inputField.getText()), graph, brushMeanShift);	// Create new animation for Mean Shift clustering
 							} catch (NullPointerException npe) {
 								// Empty catch
 							}
-							// Create new animation for Mean Shift clustering
-							currentAnimation = new MeanShift(Integer.parseInt(inputField.getText()), graph, brushMeanShift);
 						}
 					});
 				}
