@@ -144,7 +144,7 @@ public class Main extends Application {
 					// Dialog config
 					TextInputDialog getKDialog = new TextInputDialog();
 					getKDialog.setTitle("Get K-value Dialog");
-					getKDialog.setHeaderText("Enter K-value (must be an integer)");
+					getKDialog.setHeaderText("Enter K-value (must be an integer between 1 and 6)");
 					getKDialog.show();
 					// Input check: disable OK button if input is invalid
 					Button okButton = (Button) getKDialog.getDialogPane().lookupButton(ButtonType.OK);
@@ -155,9 +155,34 @@ public class Main extends Application {
 					okButton.setOnAction(new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent arg0) {
-							currentAnimation = new KMeans();
+							// Disable other algorithm canvases
+							canvasKNN.setVisible(false);
+							canvasMeanShift.setVisible(false);
+							// Enable current algorithm canvas
+							canvasKMeans.setVisible(true);
+							// Create new brush for current algorithm canvas
+							Brush brushKMeans = new Brush(canvasKMeans.getGraphicsContext2D(), canvasKMeans.getWidth(), canvasKMeans.getHeight());
+							brushKMeans.clear();
+							
+							try {
+								Node uncategorizedNode = graph.getUncategorizedNode();
+								brushGraph.clearPoint(uncategorizedNode.getX(), uncategorizedNode.getY());							// Clear graph canvas' uncategorized node if exists
+								currentAnimation = new KMeans(Integer.parseInt(inputField.getText()), graph, brushKMeans);			// Create new animation for K-Means Clustering
+							}
+							catch (NullPointerException npe) {
+								currentAnimation = new KMeans(Integer.parseInt(inputField.getText()), graph, brushKMeans);			// Create new animation for K-Means Clustering
+							}
 						}
 					});
+				}
+				private boolean isValid(String text) {
+					int number = 0;
+					try {
+						number = Integer.parseInt(text);
+					} catch (Exception e) {
+						return false;
+					}
+					return (number >= 1 && number <= 6);
 				}
 			});
 			// Implementation of MeanShift button function
