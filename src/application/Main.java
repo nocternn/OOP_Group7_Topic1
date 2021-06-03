@@ -90,6 +90,9 @@ public class Main extends Application {
 							// Clear the previous graph and canvas
 							graph.clear();
 							brushGraph.clear();
+							canvasKMeans.setVisible(false);
+							canvasKNN.setVisible(false);
+							canvasMeanShift.setVisible(false);
 							// Generate new graph and draw it
 							graph.generate(Integer.parseInt(inputField.getText()), 1000, 650);
 							brushGraph.drawGraph(graph.getNodes());

@@ -16,20 +16,12 @@ import javafx.util.Duration;
 public class KMeans implements Animation {
 	private Brush brush;
 	private Timeline timeline;
-	private ArrayList<Node> categorizedNodes;
-	private ArrayList<Node> centers = new ArrayList<>();
-	private ArrayList<Node> newcenters = new ArrayList<>();
 	
 	public KMeans() {
 		//Empty
 	}
 	
 	public KMeans(int centerNum, Graph graph, Brush brush) {
-		this.categorizedNodes = graph.getCategorizedNodes();
-		for (Node i: categorizedNodes) {
-			i.setCategory(Color.BLACK);				//Start by set all color of nodes to black (which is uncategorized yet)
-		}
-		brush.drawGraph(this.categorizedNodes);
 		this.timeline = new Timeline();
 		this.brush = brush;
 		KMeansClustering(graph, centerNum);
@@ -92,42 +84,36 @@ public class KMeans implements Animation {
 	}
 	
 	public void KMeansClustering(Graph graph, int centerNum) {
+		ArrayList<Node> categorizedNodes;
+		ArrayList<Node> centers = new ArrayList<>();
+		ArrayList<Node> newcenters = new ArrayList<>();
 		double timeBetweenFrames = 0;
 		Boolean check = true;
 		
-		KMeansInitCenters(centerNum);
-		do {
+		categorizedNodes = graph.getCategorizedNodes();
+		for (Node i: categorizedNodes) {
+			i.setCategory(Color.BLACK);				//Start by set all color of nodes to black (which is uncategorized yet)
+		}
+		brush.drawGraph(categorizedNodes);
+		
+		KMeansInitCenters(centerNum, centers);
+		do {			
 			KMeansPredictLabels(categorizedNodes, centers);
 			this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames), (event) -> {
+//				KMeansPredictLabels(categorizedNodes, centers);
 				System.out.println("[Step] Predict");
 				this.brush.clear();
 				this.brush.drawGraph(categorizedNodes);					// Display all nodes with color on canvas
-				this.brush.drawGraphCenters(centers);
-				timeline.pause();
-				PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
-		        pause.setOnFinished((pauseEvent) -> {
-		        	this.timeline.play();
-		        });
-		        pause.play();
+				this.brush.drawGraphCenters(centers);					// Display all centers before update
 			}));
 			
-			KMeansUpdateCenters(categorizedNodes, centerNum, centers);			
-//			brush.clear();																// Clear canvas with old centers
-//			brush.drawGraph(categorizedNodes);											// Re-draw nodes with color
-//			brush.drawGraphCenters(newcenters);											// Draw the updated centers
-			
-			
+			KMeansUpdateCenters(categorizedNodes, centerNum, centers, newcenters);
 			this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames+1), (event) -> {
+//				KMeansUpdateCenters(categorizedNodes, centerNum, centers, newcenters);
 				System.out.println("[Step] Update");
-				this.brush.clear();																// Clear canvas with old centers
-				this.brush.drawGraph(categorizedNodes);											// Re-draw nodes with color
-				this.brush.drawGraphCenters(this.newcenters);									// Draw the updated centers
-				timeline.pause();
-				PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
-		        pause.setOnFinished((pauseEvent) -> {
-		        	this.timeline.play();
-		        });
-		        pause.play();
+				this.brush.clear();														// Clear canvas with old centers
+				this.brush.drawGraph(categorizedNodes);									// Re-draw nodes with color
+				this.brush.drawGraphCenters(newcenters);								// Draw the updated centers
 		        System.out.println("Done Step");
 			}));
 			
@@ -148,7 +134,7 @@ public class KMeans implements Animation {
 	}
 	
 	// Create new random Centers
-	public void KMeansInitCenters(int centerNum) {
+	public void KMeansInitCenters(int centerNum, ArrayList<Node> centers) {
 		Random rand = new Random();
 		for (int i=0; i<centerNum; i++) {
 			// Create a new center at random location with Color at index i from NodeCategories
@@ -174,7 +160,7 @@ public class KMeans implements Animation {
 	}
 	
 	// Update new center position
-	public void KMeansUpdateCenters(ArrayList<Node> categorizedNodes, int centerNum, ArrayList<Node> centers) {
+	public void KMeansUpdateCenters(ArrayList<Node> categorizedNodes, int centerNum, ArrayList<Node> centers, ArrayList<Node> newcenters) {
 		int count;
 		long sumx, sumy;
 		
