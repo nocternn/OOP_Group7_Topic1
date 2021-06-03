@@ -64,8 +64,9 @@ public class KNN implements Animation {
 		double previousTime = Math.floor(this.timeline.getCurrentTime().toSeconds()) - 1;
 		if (previousTime < 0) {
 			this.brush.clear();
-			this.brush.drawPoint(uncategorizedNode.getX(), uncategorizedNode.getY(), uncategorizedNode.getCategory());
-		} else {
+			this.brush.drawPoint(uncategorizedNode.getX(), uncategorizedNode.getY(), Color.BLACK);
+		} 
+		else {
 			this.timeline.playFrom(Duration.seconds(previousTime));
 			PauseTransition pause = new PauseTransition(Duration.seconds(1));
 	        pause.setOnFinished((pauseEvent) -> {
@@ -103,7 +104,6 @@ public class KNN implements Animation {
 				brush.drawLine(newNode.getX(), newNode.getY(), i.getX(), i.getY());
 				System.out.println("[INFO] Get distance");
 			}));
-			timeBetweenFrames += 0.05;
 		}
 		
 		//Sort the distances in ascending order
