@@ -67,7 +67,6 @@ public class KMeans implements Animation {
 		double previousTime = Math.floor(this.timeline.getCurrentTime().toSeconds()) - 1;
 		if (previousTime < 0) {
 			this.brush.clear();
-			this.brush.drawGraphCenters(centers);
 		} else {
 			this.timeline.playFrom(Duration.seconds(previousTime));
 			PauseTransition pause = new PauseTransition(Duration.seconds(1));
@@ -93,29 +92,59 @@ public class KMeans implements Animation {
 	}
 	
 	public void KMeansClustering(Graph graph, int centerNum) {
-		int count = 0;
 		double timeBetweenFrames = 0;
+		Boolean check = true;
+		
 		KMeansInitCenters(centerNum);
-		KMeansPredictLabels(categorizedNodes, centers);
-		System.out.println("[INFO] Count = " + count);
-		KMeansUpdateCenters(categorizedNodes, centerNum, centers);
 		do {
-			count++;
+			KMeansPredictLabels(categorizedNodes, centers);
 			this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames), (event) -> {
+				System.out.println("[Step] Predict");
+				this.brush.clear();
+				this.brush.drawGraph(categorizedNodes);					// Display all nodes with color on canvas
+				this.brush.drawGraphCenters(centers);
 				timeline.pause();
 				PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
-				pause.setOnFinished((pauseEvent) -> {
-					timeline.play();
-				});
-				pause.play();
+		        pause.setOnFinished((pauseEvent) -> {
+		        	this.timeline.play();
+		        });
+		        pause.play();
 			}));
+			
+			KMeansUpdateCenters(categorizedNodes, centerNum, centers);			
+//			brush.clear();																// Clear canvas with old centers
+//			brush.drawGraph(categorizedNodes);											// Re-draw nodes with color
+//			brush.drawGraphCenters(newcenters);											// Draw the updated centers
+			
+			
+			this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames+1), (event) -> {
+				System.out.println("[Step] Update");
+				this.brush.clear();																// Clear canvas with old centers
+				this.brush.drawGraph(categorizedNodes);											// Re-draw nodes with color
+				this.brush.drawGraphCenters(this.newcenters);									// Draw the updated centers
+				timeline.pause();
+				PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
+		        pause.setOnFinished((pauseEvent) -> {
+		        	this.timeline.play();
+		        });
+		        pause.play();
+		        System.out.println("Done Step");
+			}));
+			
+			check = KMeansConvergedCheck(centers, newcenters, centerNum) == true && timeBetweenFrames <= 100;
+			
 			centers.clear();
 			for (Node i: newcenters) {
 				centers.add(i);
 			}
-			timeBetweenFrames += 1;
+			
+			timeBetweenFrames += 2;
+			
+
+			System.out.println("[INFO] Frame Rendered = " + timeBetweenFrames);
 		}
-		while (KMeansConvergedCheck(centers, newcenters, centerNum) == true && count <= 100);
+		//Until 100 loops or updated distance between old and new centers is small enough
+		while (check);
 	}
 	
 	// Create new random Centers
@@ -123,7 +152,8 @@ public class KMeans implements Animation {
 		Random rand = new Random();
 		for (int i=0; i<centerNum; i++) {
 			// Create a new center at random location with Color at index i from NodeCategories
-			Node node = new Node(rand.nextInt(1000), rand.nextInt(650), NodeCategories.getColor(i));
+			Node node = new Node(rand.nextDouble()*1000, rand.nextDouble()*650, NodeCategories.getColor(i));
+//			System.out.println("[INFO] Initiate Center no." + i + ": " + node.getX() + " " + node.getY());
 			centers.add(node);					// Add that center to ArrayList
 		}
 		brush.drawGraphCenters(centers);		// Display centers on canvas
@@ -141,13 +171,14 @@ public class KMeans implements Animation {
 				}
 			}
 		}
-		brush.drawGraph(categorizedNodes);					// Display all nodes with color on canvas
 	}
 	
 	// Update new center position
 	public void KMeansUpdateCenters(ArrayList<Node> categorizedNodes, int centerNum, ArrayList<Node> centers) {
 		int count;
 		long sumx, sumy;
+		
+		newcenters.clear();
 		for (Node i: centers) {
 			count = 0;										// Count number of node having same color as center i
 			sumx = 0; sumy = 0;								// Sum of coordinates in x and y axis
@@ -163,18 +194,18 @@ public class KMeans implements Animation {
 			} else {
 				newcenters.add(new Node(i.getX(), i.getY(), i.getCategory()));		// Do not change coordinate of center has no node with same color
 			}
-			brush.clearCenter(i.getX(), i.getY());									// Erase old node on canvas
 		}
-		for (Node j: categorizedNodes) {
-			brush.drawPoint(j.getX(), j.getY(), j.getCategory());					// Re-draw all nodes with color assigned
-		}
-		brush.drawGraphCenters(newcenters);											// Draw the updated centers
 	}
 	
 	private boolean KMeansConvergedCheck(ArrayList<Node> centers, ArrayList<Node> newcenters, int centerNum) {
 		double distmax = 0;				//calculate max distance between pre-update and after-update pair of centers
-		for (int i = 0; i < centers.size(); i++) {
-			distmax = Math.max(distmax, distance(centers.get(i), newcenters.get(i)));
+		
+		for (int i = 0; i < centerNum; i++) {
+			distmax = Math.max(distmax, distance(centers.get(i), newcenters.get(i)));		
+			
+//			System.out.println("Distance: " + distance(centers.get(i), newcenters.get(i)));			
+//			System.out.println("Center: " + centers.get(i).getX() + " " + centers.get(i).getY() + " - New Center:" + newcenters.get(i).getX() + " " + newcenters.get(i).getY());
+			
 			if (distmax > 2) {
 				return true;			//true means "Need to recalculate"
 			}
