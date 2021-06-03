@@ -8,6 +8,11 @@ import javafx.scene.paint.Color;
 public class Graph {
 	private ArrayList<Node> categorizedNodes;
 	private Node uncategorizedNode;
+	int numClusters = 0;
+
+	public int getNumClusters() {
+		return numClusters;
+	}
 
 	// Constructor
 	public Graph() {
@@ -92,7 +97,6 @@ public class Graph {
 		// Initiate generator
 		Random rand = new Random();
 		// Generate number of clusters
-		int numClusters = 0;
 		while (numClusters < 3)
 			numClusters = rand.nextInt(NodeCategories.getSize());
 		// Generate cluster centers

@@ -28,6 +28,16 @@ public class Brush {
 	}
 	
 	/**
+	 * Draw the given nodes list of centers.
+	 * @param nodes
+	 */
+	public void drawGraphCenters(ArrayList<Node> nodes) {
+		for (Node node : nodes) {
+			drawCenter(node.getX(), node.getY(), node.getCategory());
+		}
+	}
+	
+	/**
 	 * Draw a non-categorized point on the canvas at (x, y)
 	 * with width = height = 5 and arc width = arc height = 1.
 	 * @param x
@@ -36,6 +46,19 @@ public class Brush {
 	public void drawPoint(double x, double y, Color color) {
 		graphicsContext.setFill(color);
 		graphicsContext.fillRect(x, y, 5, 5);
+	}
+	
+	/**
+	 * Draw a node lists of centers
+	 * with width = height = 10 and arc width = arc height = 1.
+	 * @param x
+	 * @param y
+	 */	
+	public void drawCenter(double x, double y, Color color) {
+		graphicsContext.setFill(Color.BLACK);
+		graphicsContext.fillRect(x-1, y-1, 12, 12);
+		graphicsContext.setFill(color);
+		graphicsContext.fillRect(x, y, 10, 10);
 	}
 	
 	/**
@@ -61,5 +84,9 @@ public class Brush {
 	 */
 	public void clearPoint(double x, double y) {
 		graphicsContext.clearRect(x, y, 5, 5);
+	}
+	
+	public void clearCenter(double x, double y) {
+		graphicsContext.clearRect(x-1, y-1, 12, 12);
 	}
 }

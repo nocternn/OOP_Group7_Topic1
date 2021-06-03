@@ -2,7 +2,7 @@ package graph;
 
 import javafx.scene.paint.Color;
 
-abstract class NodeCategories {
+public class NodeCategories {
 	private static Color[] categories = {
 			Color.MAGENTA,
 			Color.ORANGE,
