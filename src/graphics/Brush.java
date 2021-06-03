@@ -72,6 +72,11 @@ public class Brush {
 		graphicsContext.strokeOval(x - radius, y - radius, radius * 2, radius * 2);
 	}
 	
+	public void drawLine(double x1, double y1, double x2, double y2) {
+		graphicsContext.setStroke(Color.BLUE);
+		graphicsContext.strokeLine(x1, y1, x2, y2);
+	}
+	
 	/**
 	 * Clear the canvas
 	 */

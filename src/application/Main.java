@@ -130,11 +130,27 @@ public class Main extends Application {
 					TextField inputField = getKDialog.getEditor();
 					BooleanBinding isValid = Bindings.createBooleanBinding(() -> !isValid(inputField.getText()), inputField.textProperty());
 					okButton.disableProperty().bind(isValid);
-					// Set action on OK button click - change the current animation to animate Mean Shift algorithm
+					// Set action on OK button click - change the current animation to animate KNN algorithm
 					okButton.setOnAction(new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent arg0) {
-							currentAnimation = new KNN();
+							// Disable other algorithm canvases
+							canvasKMeans.setVisible(false);
+							canvasMeanShift.setVisible(false);
+							// Enable current algorithm canvas
+							canvasKNN.setVisible(true);
+							// Create new brush for current algorithm canvas
+							Brush brushKNN = new Brush(canvasKNN.getGraphicsContext2D(), canvasKNN.getWidth(), canvasKNN.getHeight());
+							brushKNN.clear();
+							try {
+								Node uncategorizedNode = graph.getUncategorizedNode();
+								brushGraph.clearPoint(uncategorizedNode.getX(), uncategorizedNode.getY());							// Clear graph canvas' uncategorized node
+								brushKNN.drawPoint(uncategorizedNode.getX(), uncategorizedNode.getY(), Color.BLACK);			// Draw uncategorized node on Mean Shift canvas
+								currentAnimation = new KNN(Integer.parseInt(inputField.getText()), graph, brushKNN);	// Create new animation for Mean Shift clustering
+							} catch (NullPointerException npe) {
+								currentAnimation = null;
+								canvasKNN.setVisible(false);
+							}
 						}
 					});
 				}
@@ -154,7 +170,7 @@ public class Main extends Application {
 					TextField inputField = getKDialog.getEditor();
 					BooleanBinding isValid = Bindings.createBooleanBinding(() -> !isValid(inputField.getText()), inputField.textProperty());
 					okButton.disableProperty().bind(isValid);
-					// Set action on OK button click - change the current animation to animate Mean Shift algorithm
+					// Set action on OK button click - change the current animation to animate KMeans algorithm
 					okButton.setOnAction(new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent arg0) {
