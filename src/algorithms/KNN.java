@@ -68,7 +68,7 @@ public class KNN implements Animation {
 		} 
 		else {
 			this.timeline.playFrom(Duration.seconds(previousTime));
-			PauseTransition pause = new PauseTransition(Duration.seconds(1));
+			PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
 	        pause.setOnFinished((pauseEvent) -> {
 	        	this.timeline.pause();
 	        });
@@ -82,7 +82,7 @@ public class KNN implements Animation {
 		this.timeline.pause();
 		double nextTime = Math.ceil(this.timeline.getCurrentTime().toSeconds());
 		this.timeline.playFrom(Duration.seconds(nextTime));
-		PauseTransition pause = new PauseTransition(Duration.seconds(1));
+		PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
         pause.setOnFinished((pauseEvent) -> {
         	this.timeline.pause();
         });
@@ -97,6 +97,9 @@ public class KNN implements Animation {
 		Map<Double, Node> nodeDistance = new HashMap<Double, Node>();
 		
 		//Get the distance from the uncategorized node to all categorized nodes
+		this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames), (event) -> {
+			brush.clear();
+		}));
 		for (Node i: categorizedNode) {
 			nodeDistance.put(distance(newNode,i), i); // store Node with its distance
 			//Set animation: Calculate distance

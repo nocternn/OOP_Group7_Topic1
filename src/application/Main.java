@@ -53,20 +53,6 @@ public class Main extends Application {
 			canvasMeanShift.setVisible(false);
 			
 			final Brush brushGraph = new Brush(canvasGraph.getGraphicsContext2D(), canvasGraph.getWidth(), canvasGraph.getHeight());
-			canvasGraph.setOnMouseClicked(new EventHandler<MouseEvent>() {
-				public void handle(MouseEvent event) {
-					// Get old uncategorized node and clear it from canvas
-					try {
-						Node oldNode = graph.getUncategorizedNode();
-						brushGraph.clearPoint(oldNode.getX(), oldNode.getY());
-					} catch (NullPointerException npe) {
-//						npe.printStackTrace();
-					}
-					// Set new uncategorized node and draw it
-					graph.setUncategorizedNode(new Node(event.getX(), event.getY()));
-					brushGraph.drawPoint(event.getX(), event.getY(), Color.BLACK);
-				}
-			});
 			
 			// Implementation of Generate Graph button function
 			Button btnGenerateGraph = (Button) scene.lookup("#btnGenerateGraph");
@@ -93,6 +79,8 @@ public class Main extends Application {
 							canvasKMeans.setVisible(false);
 							canvasKNN.setVisible(false);
 							canvasMeanShift.setVisible(false);
+							// Reset the animation
+							currentAnimation = null;
 							// Generate new graph and draw it
 							graph.generate(Integer.parseInt(inputField.getText()), 1000, 650);
 							brushGraph.drawGraph(graph.getNodes());
@@ -142,15 +130,10 @@ public class Main extends Application {
 							// Create new brush for current algorithm canvas
 							Brush brushKNN = new Brush(canvasKNN.getGraphicsContext2D(), canvasKNN.getWidth(), canvasKNN.getHeight());
 							brushKNN.clear();
-							try {
-								Node uncategorizedNode = graph.getUncategorizedNode();
-								brushGraph.clearPoint(uncategorizedNode.getX(), uncategorizedNode.getY());							// Clear graph canvas' uncategorized node
-								brushKNN.drawPoint(uncategorizedNode.getX(), uncategorizedNode.getY(), Color.BLACK);			// Draw uncategorized node on Mean Shift canvas
-								currentAnimation = new KNN(Integer.parseInt(inputField.getText()), graph, brushKNN);	// Create new animation for Mean Shift clustering
-							} catch (NullPointerException npe) {
-								currentAnimation = null;
-								canvasKNN.setVisible(false);
-							}
+							canvasKNN.setOnMouseClicked((event) -> {
+								allowClick(brushKNN, event);
+								currentAnimation = new KNN(Integer.parseInt(inputField.getText()), graph, brushKNN); // Create new animation for Mean Shift clustering
+							});
 						}
 					});
 				}
@@ -182,7 +165,6 @@ public class Main extends Application {
 							// Create new brush for current algorithm canvas
 							Brush brushKMeans = new Brush(canvasKMeans.getGraphicsContext2D(), canvasKMeans.getWidth(), canvasKMeans.getHeight());
 							brushKMeans.clear();
-							
 							try {
 								Node uncategorizedNode = graph.getUncategorizedNode();
 								brushGraph.clearPoint(uncategorizedNode.getX(), uncategorizedNode.getY());							// Clear graph canvas' uncategorized node if exists
@@ -231,15 +213,10 @@ public class Main extends Application {
 							// Create new brush for current algorithm canvas
 							Brush brushMeanShift = new Brush(canvasMeanShift.getGraphicsContext2D(), canvasMeanShift.getWidth(), canvasMeanShift.getHeight());
 							brushMeanShift.clear();
-							try {
-								Node uncategorizedNode = graph.getUncategorizedNode();
-								brushGraph.clearPoint(uncategorizedNode.getX(), uncategorizedNode.getY());							// Clear graph canvas' uncategorized node
-								brushMeanShift.drawPoint(uncategorizedNode.getX(), uncategorizedNode.getY(), Color.BLACK);			// Draw uncategorized node on Mean Shift canvas
+							canvasMeanShift.setOnMouseClicked((event) -> {
+								allowClick(brushMeanShift, event);
 								currentAnimation = new MeanShift(Integer.parseInt(inputField.getText()), graph, brushMeanShift);	// Create new animation for Mean Shift clustering
-							} catch (NullPointerException npe) {
-								currentAnimation = null;
-								canvasMeanShift.setVisible(false);
-							}
+							});
 						}
 					});
 				}
@@ -330,6 +307,17 @@ public class Main extends Application {
 			return false;
 		}
 		return true;
+	}
+	
+	private void allowClick(Brush brush, MouseEvent event) {
+		// Get old uncategorized node and clear it from canvas
+		try {
+			Node oldNode = graph.getUncategorizedNode();
+			brush.clearPoint(oldNode.getX(), oldNode.getY());
+		} catch (NullPointerException npe) { /* empty */ }
+		// Set new uncategorized node and draw it
+		graph.setUncategorizedNode(new Node(event.getX(), event.getY()));
+		brush.drawPoint(event.getX(), event.getY(), Color.BLACK);
 	}
 	
 	public static void main(String[] args) {
