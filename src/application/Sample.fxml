@@ -31,8 +31,6 @@
                       <AnchorPane id="menu" maxWidth="1.7976931348623157E308" prefHeight="689.0" prefWidth="289.0">
                            <children>
                               <Button id="btnGenerateGraph" alignment="CENTER" contentDisplay="CENTER" layoutX="46.0" layoutY="79.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="176.0" text="Generate New Graph" AnchorPane.rightAnchor="45.0" AnchorPane.topAnchor="79.0" />
-                              <Button id="btnLoadGraph" alignment="CENTER" contentDisplay="CENTER" layoutX="46.0" layoutY="129.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="176.0" text="Load Graph" AnchorPane.rightAnchor="45.0" AnchorPane.topAnchor="129.0" />
-                              <Button id="btnSaveGraph" alignment="CENTER" contentDisplay="CENTER" layoutX="46.0" layoutY="154.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="176.0" text="Save Graph" AnchorPane.rightAnchor="45.0" AnchorPane.topAnchor="154.0" />
                               <Button id="btnKNN" alignment="CENTER" contentDisplay="CENTER" layoutX="46.0" layoutY="264.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="176.0" text="KNN" AnchorPane.rightAnchor="45.0" AnchorPane.topAnchor="264.0" />
                               <Button id="btnKMeans" alignment="CENTER" contentDisplay="CENTER" layoutX="67.0" layoutY="314.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="176.0" text="K-Means" AnchorPane.rightAnchor="46.0" AnchorPane.topAnchor="314.0" />
                               <Button id="btnMeanShift" alignment="CENTER" contentDisplay="CENTER" layoutX="46.0" layoutY="364.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="176.0" text="Mean Shift" AnchorPane.rightAnchor="45.0" AnchorPane.topAnchor="364.0" />

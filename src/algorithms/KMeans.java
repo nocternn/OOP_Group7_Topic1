@@ -86,6 +86,8 @@ public class KMeans implements Animation {
 	public void KMeansClustering(Graph graph, int centerNum) {
 		ArrayList<Node> categorizedNodes = new ArrayList<>();
 		ArrayList<Node> centers = new ArrayList<>();
+		ArrayList<Node> newcenters = new ArrayList<>();
+		ArrayList<Node> categorizedNodescopy = new ArrayList<>();
 		double timeBetweenFrames = 0;
 		
 		this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames), (event) -> {
@@ -105,19 +107,18 @@ public class KMeans implements Animation {
 			// Create a new center at random location with Color at index i from NodeCategories
 			Node node = new Node(rand.nextDouble()*1000, rand.nextDouble()*650, NodeCategories.getColor(i));
 			centers.add(node);	// Add that center to ArrayList
-			this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames), (event) -> {
-				this.brush.drawCenter(node.getX(), node.getY(), node.getCategory());
-			}));
+			this.brush.drawCenter(node.getX(), node.getY(), node.getCategory());
 		}
 		
 		timeBetweenFrames = 1;
 
-		double SSE = Double.MAX_VALUE;
 		for (int iteration = 0; iteration < 100; iteration++) {
+			double SSE = Double.MAX_VALUE;
 			// Assign each node to the nearest centroid
 			this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames), (event) -> {
 				this.brush.clear();
 			}));
+			categorizedNodescopy.clear();
 			for (Node node: categorizedNodes) {
 				double minDist = Double.MAX_VALUE;			// minDist stores minimum distance from one node to center
 				Node nearest = null;
@@ -127,22 +128,35 @@ public class KMeans implements Animation {
 						nearest = center;					// Assign color of nearest center to that node
 						minDist = dist;						// Re-assign minDist if current distance < minDist
 					}
-					this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames), (event) -> {
-						this.brush.drawCenter(center.getX(), center.getY(), center.getCategory());
-					}));
 				}
 				node.setCategory(nearest.getCategory());
+				categorizedNodescopy.add(new Node(node.getX(), node.getY(), node.getCategory()));
+				final Node nodecopy = categorizedNodescopy.get(categorizedNodescopy.size()-1);
 				this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames), (event) -> {
-					this.brush.drawPoint(node.getX(), node.getY(), node.getCategory());
+					this.brush.drawPoint(nodecopy.getX(), nodecopy.getY(), nodecopy.getCategory());				//Print categorized Nodes
+				}));
+			}
+			for (Node center: centers) {
+				this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames), (event) -> {
+					this.brush.drawCenter(center.getX(), center.getY(), center.getCategory());
 				}));
 			}
 		
 			// Shift centroids to average of their clusters
 			this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames + 1), (event) -> {
-				this.brush.clear();
+				this.brush.clear();			//Clear everything
 			}));
 			int count;
 			long sumx, sumy;
+			categorizedNodescopy.clear();
+			for (Node node: categorizedNodes) {				//Print categorized Nodes
+				categorizedNodescopy.add(new Node(node.getX(), node.getY(), node.getCategory()));
+				final Node nodecopy = categorizedNodescopy.get(categorizedNodescopy.size()-1);
+				this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames + 1), (event) -> {
+					this.brush.drawPoint(nodecopy.getX(), nodecopy.getY(), nodecopy.getCategory());
+				}));
+			}
+			newcenters.clear();
 			for (Node center: centers) {
 				count = 0;										// Count number of node having same color as center i
 				sumx = 0; sumy = 0;								// Sum of coordinates in x and y axis
@@ -152,37 +166,35 @@ public class KMeans implements Animation {
 						sumx += node.getX();
 						sumy += node.getY();
 					}
-					this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames + 1), (event) -> {
-						this.brush.drawPoint(node.getX(), node.getY(), node.getCategory());
-					}));
 				}
 				if (count != 0) {
-					center = new Node(sumx/count, sumy/count, center.getCategory());	// Update centers that has nodes with same color
+					newcenters.add(new Node(sumx/count, sumy/count, center.getCategory()));				// Update centers that has nodes with same color
 				} else {
-					center = new Node(center.getX(), center.getY(), center.getCategory());		// Do not change coordinate of center has no node with same color
+					newcenters.add(new Node(center.getX(), center.getY(), center.getCategory()));		// Do not change coordinate of center has no node with same color
 				}
-				final Node centerCopy = center;
+				final Node centerCopy = newcenters.get(newcenters.size()-1);
 				this.timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(timeBetweenFrames + 1), (event) -> {
 					this.brush.drawCenter(centerCopy.getX(), centerCopy.getY(), centerCopy.getCategory());
 				}));
 			}
 			
 			// Check to continue
-			double newSSE = 0.0;
-	        for(Node center : centers) {
-	        	for(Node node : categorizedNodes){
-	                if(center.getCategory().equals(node.getCategory())){
-	                	newSSE += distance(center, node);
-	                }
-	            }
+	        for(int i = 0; i < centers.size(); i++) {
+	        	SSE = Math.min(SSE,distance(centers.get(i),newcenters.get(i)));
 	        }
-            if(SSE - newSSE <= 0.00005){
+	        
+            if(SSE <= 2){
                 break;
             }
-            SSE = newSSE;
+            
+            centers = new ArrayList<>(newcenters);
+			categorizedNodes = new ArrayList<>(categorizedNodescopy);
 			
 			timeBetweenFrames += 2;
+			
+			System.out.println("Steps done: " + (((int)timeBetweenFrames)/2));
 		}
+		System.out.println("DONE!");
 	}
 	
 	private double distance(Node source, Node destination) {
